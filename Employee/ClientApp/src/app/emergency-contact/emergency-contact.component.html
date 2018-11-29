@@ -1,0 +1,69 @@
+<p *ngIf="(!(eContacts && eContacts.length))">
+  
+  There are no records of Emergency Contacts in the database.
+</p><br>
+ <div>
+    <a class="btn-floating btn-large waves-effect waves-light blue" ><i class="material-icons">add</i></a>
+ </div>
+<table class="table" *ngIf="(eContacts && eContacts.length)">
+<thead>
+   <tr>
+     <th>First Name</th>
+     <th>Last Name</th>
+     <th>Fone Number</th>
+     <th>Obtions</th>
+   </tr>
+</thead>
+<tbody>
+ <tr *ngFor="let eContact of eContacts">
+   <th>{{eContact.firstName}}</th>
+   <th>{{eContact.lastName}}</th>
+   <th>{{eContact.phoneNumber}}</th>
+   <th>
+      
+       <a class="waves-effect waves-light modal-trigger" href="#eContact" (click)="getEmContact(eContact.id)"><i class="material-icons">edit</i></a>
+       <a class="waves-effect" (click)="delete(eContact.id)" > <i class="material-icons">delete</i></a>
+   </th>
+ </tr>
+</tbody>
+</table>
+
+
+<!-- Modal edit Emergency -->
+<div id="eContact" class="modal modal-fixed-footer">
+  <div  class="modal-content">
+      <h2>Edit Emergency Contact</h2><br>
+    <form #f="ngForm" novalidate>
+        <div class="form-group">
+          <label for=""><h4>First Name</h4></label>
+          <input name="fName" ngModel required #fName="ngModel"  [(ngModel)] = "selectedeContact.firstName">
+        </div>
+        <div class="form-group">
+            <label for=""><h4>Last Name</h4></label>
+            <input name="lName" ngModel required #lName="ngModel" [(ngModel)]="selectedeContact.lastName">
+        </div>
+        <div class="form-group">
+            <label for=""><h4>Phone Number</h4></label>
+            <input name="phNumber" ngModel required #lName="ngModel" [(ngModel)]="selectedeContact.phoneNumber">
+        </div>
+    </form>    
+  </div>
+  <div class="modal-footer">
+    <div class="col-md-6">
+        <button class="btn btn-prmary" (click)="save()" > Save</button>
+    </div>
+      
+  </div>
+</div>
+
+<!-- Modal Structure 
+<div id="ecDelete" class="modal modal-fixed-footer">
+    <div class="modal-content">
+      <h4>Delete Emergency Contact</h4>
+      <p>Do you want to Delete de Emergency Contact </p> 
+      <h1>{{selectedeContact.firstName}}</h1>
+    </div>
+    <div class="modal-footer">
+      <a href="#!" class="modal-close waves-effect waves-green btn-flat">Agree</a>
+    </div>
+  </div>-->

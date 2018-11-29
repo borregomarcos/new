@@ -1,0 +1,144 @@
+<h1>{{editMode ? 'Edit' : 'Add'}} Employee</h1>
+<form class="form-horizontal" novalidate 
+ [formGroup]="formGroup">
+  <fieldset>
+
+    <div class="form-group"
+         [ngClass]="{'has-error': (formGroup.get('firstName').touched || formGroup.get('firstName').dirty) && !formGroup.get('firstName').valid }">
+      <label class="col-md-2 control-label"
+             for="firstNameId"><h4> First Name</h4></label>
+
+      <div class="col-md-8">
+        <input class="form-control"
+               id="firstNameId"
+               type="text"
+               required
+               formControlName="firstName" />
+        <span class="help-block" *ngIf="(formGroup.get('firstName').touched || formGroup.get('firstName').dirty) && formGroup.get('firstName').errors">
+          <span *ngIf="formGroup.get('firstName').errors.required">
+              The first name is required.
+          </span>
+        </span>
+      </div>
+    </div>
+
+    <div class="form-group"
+         [ngClass]="{'has-error': (formGroup.get('lastName').touched || formGroup.get('lastName').dirty) && 
+         !formGroup.get('lastName').valid }">
+      <label class="col-md-2 control-label"
+             for="lastNameId"><h4>Last Name</h4></label> 
+
+      <div class="col-md-8">
+        <input class="form-control"
+               id="lastNameId"
+               type="text"
+               required
+               formControlName="lastName" />
+        <span class="help-block" *ngIf="(formGroup.get('lastName').touched || formGroup.get('lastName').dirty) && formGroup.get('lastName').errors">
+          <span *ngIf="formGroup.get('lastName').errors.pattern">
+              Only letters (a-z or A-Z).
+          </span>
+          <span *ngIf="formGroup.get('lastName').errors.required">
+            Last Name is reqire.
+        </span>
+        </span>
+      </div>
+    </div>
+
+    <div class="form-group"
+         [ngClass]="{'has-error': (formGroup.get('salary').touched || formGroup.get('salary').dirty) && !formGroup.get('salary').valid }">
+      <label class="col-md-2 control-label"
+             for="salryId"><h4>Salary</h4></label>
+
+      <div class="col-md-8">
+        <input class="form-control"
+               id="salaryId"
+               type="text"
+               required
+               formControlName="salary" />
+        <span class="help-block" *ngIf="(formGroup.get('salary').touched || formGroup.get('salary').dirty) && formGroup.get('salary').errors">
+          <span *ngIf="formGroup.get('salary').errors.required">
+              Salary is require.
+          </span>
+          <span *ngIf="formGroup.get('salary').errors.pattern">
+           Only Numbers [1-9].
+        </span>
+        </span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="col-md-2 control-label"
+             for="firstNameId"><h4>Image</h4></label>
+
+      <div class="col-md-8">
+        <input type ="file" (change)="onFileSelected($event)" style="display: none" #fileInput>
+        <button (click)="fileInput.click()">Select Image</button> 
+      </div>
+    </div>
+    
+    
+    <div class="form-group" *ngIf="(editMode)">
+      <a class="btn btn-primary" (click)="addEmergencyContac()">Add Emergency Contacts</a>
+    </div>
+
+    <div formArrayName="emergencyContact"
+         *ngFor="let eContact of formGroup.get('emergencyContact').controls; let i = index;">
+      <div [formGroupName]="i">
+        <div class="form-group">
+          <label class="col-md-2 control-label" [attr.for]="'firstName' + i">
+            <h4> First Name</h4>
+          </label>
+          <div class="col-md-8">
+            <input class="form-control" [attr.id]="'firstName' + i" type="text" formControlName="firstName" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-md-2 control-label" [attr.for]="'lastName' + i">
+            <h4>Name</h4> 
+          </label>
+          <div class="col-md-8">
+            <input class="form-control" [attr.id]="'lastName' + i" type="text" formControlName="lastName" />
+          </div>
+        </div>
+       
+        <div class="form-group">
+          <label class="col-md-2 control-label" [attr.for]="'phoneNumber' + i">
+           <h4>Phone Number</h4>
+          </label>
+          <div class="col-md-8">
+            <input class="form-control" [attr.id]="'phoneNumber' + i" type="text" formControlName="phoneNumber" />
+          </div>
+        </div>
+      
+        <div class="form-group">
+          <div class="col-md-10">
+            <button type="button" class="btn btn-danger pull-right" (click)="removeEmergencyContac(i)">Remove</button><br>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    
+
+
+    <div class="form-group">
+      <div class="col-md-4 col-md-offset-2">
+        <span>
+          <button class="btn btn-primary"
+                  type="submit"
+                  [disabled]="!formGroup.valid" (click)="save()">
+            Save
+          </button>
+          <button class="btn"
+                  type="button"
+                  [routerLink]='["/employees"]'>
+            Cancel
+          </button>
+        </span>
+
+      </div>
+
+    </div>
+  </fieldset>
+</form>
