@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { EmergencyContactService } from '../Services/emergency-contact.service';
 import { ActivatedRoute } from '@angular/router';
 import { IEmergencyContact } from './emergency-contact';
+import { EmployeeService } from '../Services/employee.service';
+import { IEmployee } from '../employee/employee';
 declare var $:any;
 declare var M:any;
 @Component({
@@ -17,7 +19,8 @@ export class EmergencyContactComponent implements OnInit {
   lastName:string;
   firstName:string;
    
-  constructor( private eCService:EmergencyContactService,private activatedRoute: ActivatedRoute) { }
+  constructor( private eCService:EmergencyContactService,private activatedRoute: ActivatedRoute,
+    private emloyeeService: EmployeeService) { }
 
   ngOnInit() {
     this.loadData();
@@ -57,5 +60,18 @@ getEmContact(id: number){
     this.loadData();
   }
 
+  test(){
+     
+    var  name:string  = "mar";
+    const fd= new FormData();
+    fd.append('firstName',name);
+    //fd.append('number','123','mynumber');
+    this.emloyeeService.postSearch (fd).subscribe(res=>console.log(res),error=>console.error(error));
+   }
+
+   ver(employee:IEmployee){
+     let  a = employee.EmergencyContacts;
+    console.log(a);
+   }
 }
 

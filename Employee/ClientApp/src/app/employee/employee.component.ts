@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {IEmployee} from './employee';
 import {EmployeeService} from '../Services/employee.service';
 import { async } from '@angular/core/testing';
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 
 @Component({
   selector: 'app-employee',
@@ -31,5 +32,21 @@ export class EmployeeComponent implements OnInit {
     this.employeeService.getEmployees().subscribe(res => this.employees=res,
       error => console.error(error));
   }
+  
+  
 
+  onSearchChange(searchValue : string ) {  
+    if(searchValue)
+    {
+      let fd  = new FormData();
+      fd.append('firstName',searchValue);
+      this.employeeService.postSearch(fd).subscribe(res=>this.employees= res,
+        error=>console.error(error));
+    }
+    else{
+      this.loadData();
+    }
+    
+  }
+  
 }

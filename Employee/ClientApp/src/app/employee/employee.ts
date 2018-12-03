@@ -3,8 +3,8 @@ import { IEmergencyContact } from "../emergency-contact/emergency-contact";
 export interface IEmployee {
     id: number;
     firstName: string;
-    lastName: String;
+    lastName: string;
     salary: number;
     img: number[];
-    EmergencyContact: IEmergencyContact[];
+    EmergencyContacts: IEmergencyContact[];
 }

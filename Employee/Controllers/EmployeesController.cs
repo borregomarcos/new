@@ -9,6 +9,7 @@ using Employee.Models;
 using Microsoft.AspNetCore.Hosting;
 using System.IO;
 using System.Collections;
+using Microsoft.Extensions.Primitives;
 
 namespace Employee.Controllers
 {
@@ -33,7 +34,7 @@ namespace Employee.Controllers
 
         // GET: api/Employees/5
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetEmployee([FromRoute] int id, bool emergencyContac =false)
+        public async Task<IActionResult> GetEmployee([FromRoute] int id, bool emergencyContac =false)   
         {
             if (!ModelState.IsValid)
             {
@@ -48,8 +49,11 @@ namespace Employee.Controllers
             else
             {
                 employee = await _context.Employees.FindAsync(id);
+              
             }
-             
+            //EmergencyContact emc;
+             //employee = await _context.Employees.Include(x => x.EmergenceContacts).SingleOrDefaultAsync(m => m.Id == id);
+            //emc = employee.EmergenceContacts.FirstOrDefault();
 
             if (employee == null)
             {
@@ -59,12 +63,24 @@ namespace Employee.Controllers
             return Ok(employee);
         }
 
+        [HttpPost("search")]
+        public IEnumerable search([FromForm] string  firstName)
+        {
+           return  _context.Employees.Where(x=>x.firstName.StartsWith(firstName)).ToList();
+           
+        }
+
+        /*StringValues firstName;
+        HttpContext.Request.Form.TryGetValue("firstName", out firstName);
+        //return   _context.Employees.Where(x => x.firstName.StartsWith(firstName)).ToList();
+        return _context.Employees.Where(x => x.firstName.StartsWith(firstName)).ToList();
+        */
+        //}
         // PUT: api/Employees/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutEmployee([FromRoute] int id, [FromBody] Employee.Models.Employee employee)
+        public async Task<IActionResult> PutEmployee([FromRoute] int id, IFormFile image, [FromForm] Employee.Models.Employee employee)
         {
-            /*Models.Employee oldEmployee = await _context.Employees.FindAsync(id);
-            employee.img = oldEmployee.img;*/
+            
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -73,6 +89,11 @@ namespace Employee.Controllers
             if (id != employee.Id)
             {
                 return BadRequest();
+            }
+
+            if (image != null)
+            {
+                employee.img = await convertImg(image);
             }
 
             _context.Entry(employee).State = EntityState.Modified;
@@ -97,15 +118,15 @@ namespace Employee.Controllers
         }
 
         // POST: api/Employees
-        [HttpPost]
-        public async Task<IActionResult> PostEmployee([FromBody] Employee.Models.Employee employee)
+       [HttpPost]
+        public async Task<IActionResult> PostEmployee(IFormFile image, [FromForm] Models.Employee employee)
         {
+            if (image !=null)
+                employee.img = await convertImg(image);
+            else
+                employee.img = null;
 
-            
-                //---------------------------------------
-
-
-                if (!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
@@ -138,23 +159,16 @@ namespace Employee.Controllers
         //}
         ////-------
 
-        [HttpPost("upload")]
-        public byte[] upload(IFormFile image)
-        {
-            /*employee = new Models.Employee();
-            employee.firstName = "marocs";
-            employee.lastName = "borrego";
-            employee.salary = 1000;*/
-            //string f = employee.firstName;
-            //Models.Employee employee = await _context.Employees.FindAsync(id);
+        public async Task <byte[]> convertImg(IFormFile image)
+        { 
 
-
+            byte[] res;
             using (var stream = new MemoryStream())
                     {
-                         image.CopyToAsync(stream);
-                         return stream.ToArray();
+                         await image.CopyToAsync(stream);
+                        res = stream.ToArray();
                     }
-
+            return res;  
         }
 
         [HttpGet("img/{id}")]

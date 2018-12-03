@@ -1,5 +1,5 @@
 import { Injectable, Inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import { IEmployee } from '../employee/employee';
 
@@ -14,19 +14,19 @@ export class EmployeeService {
   getEmployees(): Observable<IEmployee[]>{
     return this.http.get<IEmployee[]>(this.employeeUrl);
   }
-  postEmployees(employee: IEmployee): Observable<IEmployee>{
-    return this.http.post<IEmployee>(this.employeeUrl, employee);
+  postEmployees(fd: FormData): Observable<IEmployee>{
+    return this.http.post<IEmployee>(this.employeeUrl, fd);
   }
 
-  postUpload( image: FormData): Observable<number[]>{
-    return this.http.post<number[]>(this.employeeUrl+"/upload", image);
-  }
+  /*postUpload( fd: FormData): Observable<number[]>{
+    return this.http.post<number[]>(this.employeeUrl+"/upload", fd);
+  }*/
   getEmployee(id: string): Observable<IEmployee>{
     let params= new HttpParams().set("emergencyContac","true");
     return this.http.get<IEmployee>(this.employeeUrl + "/" + id /*,{params: params}*/);
   }
-  putEployee(employee: IEmployee):Observable<IEmployee> {
-    return this.http.put<IEmployee>(this.employeeUrl+ "/" + employee.id, employee);
+  putEployee(fd: FormData, id: string):Observable<IEmployee> {
+    return this.http.put<IEmployee>(this.employeeUrl+ "/" + id, fd);
   }
   deleteEmloyee(id: string): Observable<IEmployee>{
     return this.http.delete<IEmployee>(this.employeeUrl+"/"+id);
@@ -35,5 +35,8 @@ export class EmployeeService {
     return this.http.get<Blob>(this.employeeUrl+"/"+"img/"+id);
   }
   
+  postSearch(fd : FormData ):Observable<IEmployee[]> {  
+    return this.http.post<IEmployee[]>(this.employeeUrl +"/search/",fd);
+  }
 
 }

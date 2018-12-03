@@ -24,6 +24,7 @@ export class CreateEmployeeComponent implements OnInit {
   ecToDelete: number[] = [];
   employeeId: number; 
   countFG: number =0;
+  selectedEmployee:IEmployee;
   selectedEmployeeImg:number[];
   ngOnInit() {
     this.formGroup=this.fb.group({
@@ -56,6 +57,7 @@ export class CreateEmployeeComponent implements OnInit {
       
     });
     this.selectedEmployeeImg =employee.img;
+    this.selectedEmployee=employee;
      
   }
 
@@ -68,7 +70,7 @@ export class CreateEmployeeComponent implements OnInit {
       { //form on edit mode 
         this.updateEmployee(this.employeeId);
         this.saveEContact();
-        M.toast({html: 'Edit Successful', classes: 'rounded'});
+        //M.toast({html: 'Edit Successful', classes: 'rounded'});
       }
     else
     {// form on add mode
@@ -83,32 +85,19 @@ export class CreateEmployeeComponent implements OnInit {
     this.router.navigate(['/employees']);
   }
 
-  async saveEpmloyee(){
-    let employee: IEmployee = Object.assign({}, this.formGroup.value);
-    if(this.selctedFile)
-       {
-        const fd= new FormData();
-        fd.append('image',this.selctedFile, this.selctedFile.name);
-        await this.employeeService.postEmployees(employee)
-          .subscribe(res=> this.updateEmployee(res.id), 
-            error=>console.error(error));
-       }
-    else
-    {
-      await this.employeeService.postEmployees(employee)
-      .subscribe(employee=> this.onSaveSuccess(),
-         error=>console.error(error));
-    }   
-    
+  async saveEpmloyee(){  
+   await this.employeeService.postEmployees(this.loadFd()).subscribe(employee=>this.onSaveSuccess(),
+      error=>console.error(error));
   }
+
   async updateEmployee(id: number )
   { 
     if (this.selctedFile)
     {
-      const fd= new FormData();
-      fd.append('image',this.selctedFile, this.selctedFile.name);
-      await this.employeeService.postUpload(fd).subscribe(res=>this.selectedEmployeeImg=res,
-        error=>console.error(error),()=>this.updeteEm(id));
+      let fd: FormData = this.loadFd();
+      fd.append('id', id.toString());
+      await this.employeeService.putEployee(fd, id.toString()).subscribe(res=>this.onSaveSuccess(),
+        error=>console.error(error));
     }
     else
     {
@@ -118,14 +107,13 @@ export class CreateEmployeeComponent implements OnInit {
   }
 async updeteEm(id: number)
 { 
-  let employee: IEmployee = Object.assign({}, this.formGroup.value);
-    employee.id = id;
-    employee.img =this.selectedEmployeeImg;
-    await this.employeeService.putEployee(employee)
-      .subscribe(res=> this.onSaveSuccess(),
-         error=>console.error(error));  
-  
+  let fd: FormData = this.loadFd();
+  fd.append('id', id.toString());
+  await this.employeeService.putEployee(fd, id.toString())
+    .subscribe(res=> this.onSaveSuccess(),
+        error=>console.error(error));  
 }
+
   addEmergencyContac() {
     let ecArr = this.formGroup.get('emergencyContact') as FormArray;
     let ecFG = this.builEmergencyContac();
@@ -167,4 +155,33 @@ async updeteEm(id: number)
         }
       }        
   }
+  loadFd(): FormData{
+    let fd = new FormData;
+    this.selectedEmployee =  Object.assign({}, this.formGroup.value);
+    if(this.selctedFile)
+    {
+      fd.append('image',this.selctedFile, this.selctedFile.name);
+      fd.append('firstName', this.selectedEmployee.firstName);
+      fd.append('lastName', this.selectedEmployee.lastName);
+      fd.append('salary', this.selectedEmployee.salary.toString());
+      fd.append('img',this.selectedEmployee.img.toString());
+    }
+    else
+    {
+      fd.append('image',"");
+      fd.append('firstName', this.selectedEmployee.firstName);
+      fd.append('lastName', this.selectedEmployee.lastName);
+      fd.append('salary', this.selectedEmployee.salary.toString());
+      if(this.editMode)
+      {
+        fd.append('img', this.selectedEmployeeImg.toString());
+      }  
+      else  
+      {
+        fd.append('img',this.selectedEmployee.img.toString());
+      }
+    }
+    return fd;
+  }
+
 }
